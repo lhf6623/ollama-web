@@ -2,10 +2,10 @@ import { createApp } from "vue";
 import App from "./App.vue";
 import "@unocss/reset/tailwind-compat.css";
 import "virtual:uno.css";
-import { create, NButton, NSelect, NSpin, NPopover } from "naive-ui";
+import { create, NButton, NSelect, NSpin, NPopover, NTag } from "naive-ui";
 
 const naive = create({
-  components: [NButton, NSelect, NSpin, NPopover],
+  components: [NButton, NSelect, NSpin, NPopover, NTag],
 });
 
 import { pinia } from "./store";

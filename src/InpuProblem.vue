@@ -1,11 +1,5 @@
 <template>
   <div class="h160px relative flex flex-col flex-shrink-0">
-    <div v-if="isEdit" class="flex justify-between items-center">
-      <span>正在编辑</span>
-      <NButton text @click="exitEdit()">
-        <i class="i-material-symbols:close-rounded text-18px"></i>
-      </NButton>
-    </div>
     <div
       class="h5px wfull absolute top-0 left-0 after:bg-#e0e0e0 after:top-0 after:wfull after:h1px after:content-[''] after:absolute"
       v-drag.vertical="[100, 300]"
@@ -19,6 +13,15 @@
         <NButton text title="生成图片">
           <i class="i-lets-icons:img-box-duotone-line"></i>
         </NButton>
+        <NTag
+          v-if="isEdit"
+          size="small"
+          type="warning"
+          closable
+          @close="exitEdit()"
+        >
+          正在编辑
+        </NTag>
       </div>
       <div class="flex items-center justify-end gap-2">
         <NButton
@@ -148,6 +151,13 @@
     input.value = "";
     store.exitEditChat();
   };
+
+  watch(
+    () => store.currentId,
+    () => {
+      input.value = "";
+    }
+  );
 
   const showMenu = () => {
     store.showMenu = !store.showMenu;

@@ -82,13 +82,17 @@ export const useStore = defineStore("store", {
       this.menu.find((item) => item.date == this.currentId)!.chatList = _list;
     },
     editChat(index: number) {
-      const list =
-        this.menu.find((item) => item.date == this.currentId)?.chatList || [];
+      const id = this.currentId;
+      const i = this.menu.findIndex(({ date }) => date == id);
+      if (i == -1) return;
+      const list = this.menu[i].chatList;
 
-      list.splice(index);
-      this.editList = list;
+      const _list = list.splice(index);
+      console.log(`🚀 ~ _list:`, _list);
+      this.editList = _list;
     },
     addChat(chat: Message | ChatMessage) {
+      // 初始化的时候是没有 currentId 的，创建新菜单
       if (this.menu.length === 0) {
         this.addNewMenu();
         const menu = {
@@ -100,6 +104,7 @@ export const useStore = defineStore("store", {
       }
       const id = this.currentId;
       let index = this.menu.findIndex(({ date }) => date == id);
+      // 有菜单，但是是新开启的菜单
       if (index === -1) {
         const menu = {
           date: this.currentId,
@@ -108,6 +113,10 @@ export const useStore = defineStore("store", {
         };
         this.menu.push(menu);
         index = this.menu.findIndex(({ date }) => date == id);
+      }
+      // 如果 chatList 为空，重新填充 [menu].title
+      if (!this.menu[index].chatList.length) {
+        this.menu[index].title = chat?.content || "";
       }
       this.menu[index].chatList.push({
         ...chat,
@@ -125,6 +134,9 @@ export const useStore = defineStore("store", {
       }
     },
     addNewMenu() {
+      if (this.editList.length) {
+        this.exitEditChat();
+      }
       this.currentId = Date.now();
     },
     changeChat(id?: number | string) {
