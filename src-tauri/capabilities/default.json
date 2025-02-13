@@ -10,25 +10,17 @@
     "core:window:allow-start-dragging",
     "core:default",
     "opener:default",
+    "shell:default",
+    "shell:allow-open",
+    "shell:allow-execute",
+    "fs:default",
     {
       "identifier": "shell:allow-execute",
       "allow": [
         {
-          "name": "ollama-serve",
+          "name": "ollama-shell",
           "cmd": "ollama",
-          "args": [
-            "serve"
-          ]
-        },
-        {
-          "name": "ollama-stop",
-          "cmd": "ollama",
-          "args": [
-            "stop",
-            {
-              "validator": "\\S+"
-            }
-          ]
+          "args": true
         }
       ]
     }
