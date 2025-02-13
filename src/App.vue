@@ -7,14 +7,16 @@
 </script>
 
 <template>
-  <div class="hfull wfull flex">
-    <Menu></Menu>
-    <main class="overflow-hidden relative hfull flex flex-1 flex-col pt34px">
-      <Title :title="pck.name"></Title>
-      <ChatList></ChatList>
-      <InpuProblem></InpuProblem>
-    </main>
-  </div>
+  <NDialogProvider>
+    <div class="hfull wfull flex">
+      <Menu></Menu>
+      <main class="overflow-hidden relative hfull flex flex-1 flex-col pt34px">
+        <Title :title="pck.name"></Title>
+        <ChatList></ChatList>
+        <InpuProblem></InpuProblem>
+      </main>
+    </div>
+  </NDialogProvider>
 </template>
 
 <style>

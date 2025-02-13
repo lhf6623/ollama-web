@@ -10,7 +10,7 @@
         <NButton text title="展示菜单" @click="showMenu()">
           <i class="i-material-symbols:menu-book-outline"></i>
         </NButton>
-        <NButton text title="生成图片">
+        <NButton text title="生成图片" v-if="false">
           <i class="i-lets-icons:img-box-duotone-line"></i>
         </NButton>
         <NTag
@@ -33,7 +33,20 @@
         >
           <i class="i-mdi:pause"></i>
         </NButton>
-        <ModelList></ModelList>
+        <NSelect
+          v-model:value="store.model"
+          :options="store.models"
+          label-field="name"
+          value-field="name"
+          size="small"
+          class="min-w-120px"
+          :disabled="store.loading"
+        >
+          <template #empty>
+            <NEmpty description="暂无模型"></NEmpty>
+          </template>
+        </NSelect>
+        <OllamaServe></OllamaServe>
       </div>
     </div>
     <textarea
@@ -46,11 +59,11 @@
 </template>
 
 <script setup lang="ts">
-  import ModelList from "./ModelList.vue";
   import ollama, { Ollama } from "ollama";
   import { computed, ref, watch } from "vue";
   import { useStore } from "./store";
   import { vDrag } from "./drag-directives";
+  import OllamaServe from "./OllamaServe.vue";
   const store = useStore();
   const input = ref("");
   const display = computed(() => {
@@ -77,7 +90,7 @@
 
     // 本地服务没开启，模型没返回
     if (!store.model) {
-      await store.getModels();
+      return;
     }
     // 组合键 上档键 和 回车键才能继续走下去
     if (e && e.key == "Enter" && e.shiftKey) {

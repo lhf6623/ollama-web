@@ -1,8 +1,6 @@
 import { Message, ModelResponse } from "ollama";
 import { createPinia, defineStore } from "pinia";
 import piniaPluginPersistedstate from "pinia-plugin-persistedstate";
-import { openOllamaServe } from "./ollamaTool";
-import ollama from "ollama";
 
 export const pinia = createPinia();
 
@@ -122,16 +120,6 @@ export const useStore = defineStore("store", {
         ...chat,
         model: this.model,
       });
-    },
-    async getModels() {
-      this.models = (await openOllamaServe(() => ollama.list())).models || [];
-      if (this.models.length === 0) {
-        this.model = "";
-      }
-      if (!this.models.find((m) => m.name === this.model)) {
-        const m = this.models[0]?.name;
-        this.model = m || "";
-      }
     },
     addNewMenu() {
       if (this.editList.length) {
