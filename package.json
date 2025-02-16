@@ -11,8 +11,6 @@
   },
   "dependencies": {
     "@tauri-apps/api": "^2.2.0",
-    "@tauri-apps/plugin-fs": "~2",
-    "@tauri-apps/plugin-opener": "^2.2.5",
     "@tauri-apps/plugin-shell": "~2.2.0",
     "@unocss/reset": "^65.4.3",
     "@vitejs/plugin-vue-jsx": "^4.1.1",

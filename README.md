@@ -6,3 +6,8 @@
 ## 预览
 
 <img src="https://github.com/lhf6623/ollama-web/raw/main/public/image.png" width="700" alt="ollama-web"  />
+
+## 运行环境
+
+- [tauri](https://tauri.app/start/prerequisites/)
+- [node](https://nodejs.org/zh-cn)

@@ -11,6 +11,7 @@ import {
   NTag,
   NDialogProvider,
   NEmpty,
+  NInput,
 } from "naive-ui";
 
 const naive = create({
@@ -22,6 +23,7 @@ const naive = create({
     NTag,
     NDialogProvider,
     NEmpty,
+    NInput,
   ],
 });
 

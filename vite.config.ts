@@ -33,6 +33,7 @@ export default defineConfig(async () => ({
           vue: ["vue", "pinia", "pinia-plugin-persistedstate"],
           marked: ["marked", "marked-highlight", "dompurify"],
           util: ["dayjs", "lodash-es"],
+          tauri: ["@tauri-apps/plugin-shell", "@tauri-apps/api"],
         },
       },
     },

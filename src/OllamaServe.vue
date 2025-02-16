@@ -1,18 +1,21 @@
 <template>
-  <NButton
-    size="small"
-    type="primary"
-    title="启动ollama服务"
-    v-if="isConnection"
-    @click="openServe()"
-  >
-    <i class="i-mdi:connection"></i>
-  </NButton>
+  <div class="flex" v-if="isConnection">
+    <NInput size="small" v-model:value="input" readonly></NInput>
+    <NButton
+      size="small"
+      type="primary"
+      title="启动ollama服务"
+      v-if="isConnection"
+      @click="openServe()"
+    >
+      <i class="i-mdi:connection"></i>
+    </NButton>
+  </div>
 </template>
 
 <script setup lang="tsx">
-  import { Command } from "@tauri-apps/plugin-shell";
-  import ollama from "ollama";
+  import { invoke } from "@tauri-apps/api/core";
+  import ollama, { ModelResponse } from "ollama";
   import { useStore } from "./store";
   import { onMounted, ref } from "vue";
   import { useDialog } from "naive-ui";
@@ -20,11 +23,39 @@
   const store = useStore();
   const isConnection = ref(true);
   const dialog = useDialog();
+  const input = ref("ollama serve");
+
+  // 获取 command 路径
+  async function getCommandPath(command: string): Promise<string> {
+    return await invoke("get_command_path", {
+      command,
+    });
+  }
 
   async function openServe() {
+    let models: ModelResponse[] = [];
+    // 判断 ollama serve 是否开启
     try {
-      await openOllamaServe();
-      const { models } = await ollama.list();
+      const list = await ollama.list();
+      models = list.models;
+      console.log("log: list.models", models);
+    } catch (e) {
+      console.log(`err: ollama.list`, e);
+      try {
+        await openOllamaServe();
+        console.log("log: openOllamaServe");
+      } catch (err) {
+        console.log("err: openOllamaServe", err);
+      }
+    }
+
+    try {
+      if (!models.length) {
+        const list = await ollama.list();
+
+        models = list.models;
+        console.log("log: ollama.list2", models);
+      }
 
       if (!models.find((m) => m.name === store.model)) {
         const m = models[0].name;
@@ -33,9 +64,10 @@
       isConnection.value = false;
       store.models = models;
     } catch (e) {
+      console.log("err: ollama.list2", e);
+
       store.model = "";
       isConnection.value = true;
-      // TODO: tauri 的 shell 插件还没弄懂 先这样搞
       dialog.warning({
         title: "ollama服务未启动",
         content: () => {
@@ -82,21 +114,19 @@
     }
   }
 
-  onMounted(async () => {
+  onMounted(() => {
     openServe();
   });
 
   async function openOllamaServe() {
-    await Command.create("ollama-shell", ["serve"]).execute();
-  }
+    const [comm, ...arg] = input.value.split(" ");
+    const path = await getCommandPath(comm);
+    console.log(path);
 
-  // function stopOllama(model: string) {
-  //   return Command.create("ollama-shell", ["stop", model]).execute();
-  // }
+    const result = (await invoke("execute_command", {
+      command: `${path} ${arg.join(" ")}`,
+      isLong: false,
+    })) as string;
+    console.log(result);
+  }
 </script>
-
-<style>
-  .a {
-    color: #343639;
-  }
-</style>
