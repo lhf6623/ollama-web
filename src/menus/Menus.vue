@@ -35,9 +35,17 @@
         @click="editMenuTitle"
         :block="true"
         class="mb-6px"
-        >重新命名</NButton
+        type="primary"
       >
-      <NButton text size="small" @click="delMenu" :block="true">删除</NButton>
+        <i class="i-mdi:edit-outline mr-10px text-18px"></i>
+        重新命名
+      </NButton>
+      <NButton text size="small" @click="delMenu" type="error" :block="true">
+        <i
+          class="i-material-symbols:delete-forever-outline-rounded mr-10px text-18px"
+        ></i>
+        删除
+      </NButton>
     </NPopover>
     <div
       class="fixed top-0 left-0 wfull hfull z-10"
@@ -124,3 +132,9 @@
       });
   });
 </script>
+
+<style>
+  .a {
+    color: #404040;
+  }
+</style>

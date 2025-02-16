@@ -125,7 +125,7 @@
 
     const result = (await invoke("execute_command", {
       command: `${path} ${arg.join(" ")}`,
-      isLong: false,
+      isLong: true,
     })) as string;
     console.log(result);
   }
