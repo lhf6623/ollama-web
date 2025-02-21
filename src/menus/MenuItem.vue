@@ -1,7 +1,7 @@
 <template>
   <div
     :data-menu_date="menu.type == 'date' ? '' : menu.date"
-    class="text-16px p6px relative rounded-10px truncate cursor-pointer"
+    class="text-16px flex items-center p6px relative rounded-10px cursor-pointer"
     :class="
       menu.type == 'date'
         ? '!text-12px !pl6px text-#5d5d5d font-500'
@@ -11,12 +11,17 @@
     "
     @click="store.changeChat(menu.date)"
   >
-    <span>{{ menu.title || "&nbsp;" }}</span>
+    <span class="flex-1 overflow-hidden whitespace-nowrap">
+      {{ menu.title || "&nbsp;" }}
+    </span>
 
     <div
       v-if="menu.type !== 'date'"
-      :class="store.currentId == menu.date ? 'bg-#cacaca' : 'bg-#eaeaea'"
-      class="absolute right-16px top-0 hfull flex items-center"
+      :style="{
+        '--bg': bg,
+        background: bg,
+      }"
+      class="h-full flex items-center box"
       @click.stop="() => {}"
     >
       <NButton text @click="menuOperate">
@@ -27,6 +32,7 @@
 </template>
 
 <script setup lang="ts">
+  import { computed } from "vue";
   import { useStore } from "../store";
   const store = useStore();
   const props = defineProps<{
@@ -36,6 +42,10 @@
       type?: string;
     };
   }>();
+
+  const bg = computed(() => {
+    return store.currentId == props.menu.date ? "#cacaca" : "#eaeaea";
+  });
 
   const emit = defineEmits<{
     menuOperate: [
@@ -55,3 +65,19 @@
     });
   }
 </script>
+
+<style lang="css" scoped>
+  .box {
+    position: relative;
+
+    &::before {
+      content: "";
+      position: absolute;
+      width: 20px;
+      left: -20px;
+      z-index: 100;
+      height: 100%;
+      background: linear-gradient(to right, transparent, var(--bg));
+    }
+  }
+</style>

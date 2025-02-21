@@ -12,6 +12,8 @@ import {
   NDialogProvider,
   NEmpty,
   NInput,
+  NCheckbox,
+  NMessageProvider,
 } from "naive-ui";
 
 const naive = create({
@@ -24,6 +26,8 @@ const naive = create({
     NDialogProvider,
     NEmpty,
     NInput,
+    NCheckbox,
+    NMessageProvider,
   ],
 });
 

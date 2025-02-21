@@ -3,6 +3,9 @@
 use std::os::windows::process::CommandExt;
 use std::process::Command;
 use std::env;
+use base64::{Engine as _, engine::general_purpose::STANDARD as BASE64};
+use std::fs;
+use serde_json;
 
 #[tauri::command]
 async fn execute_command(command: String, is_long: bool) -> Result<String, String> {
@@ -104,14 +107,78 @@ async fn get_command_path(command: String) -> Result<String, String> {
     Err(format!("未找到命令 '{}'", command))
 }
 
+#[tauri::command]
+async fn save_base64_image(base64_string: String, file_name: String) -> Result<serde_json::Value, String> {
+    
+    // 获取桌面路径
+    let desktop_path = match dirs::desktop_dir() {
+        Some(path) => {
+            path
+        },
+        None => return Err("无法获取桌面路径".to_string()),
+    };
+
+    // 创建保存图片的文件夹
+    let images_dir = desktop_path;
+    
+    fs::create_dir_all(&images_dir)
+        .map_err(|e| format!("创建文件夹失败: {}", e))?;
+
+    // 确保文件名有正确的扩展名
+    let file_name = if !file_name.ends_with(".png") && !file_name.ends_with(".jpg") {
+        format!("{}.png", file_name)
+    } else {
+        file_name
+    };
+
+    // 构建完整的文件路径
+    let file_path = images_dir.join(&file_name);
+
+    // 移除 base64 字符串中可能存在的 data URL 前缀
+    let base64_clean = base64_string
+        .replace("data:image/png;base64,", "")
+        .replace("data:image/jpeg;base64,", "");
+
+    // 解码 base64 数据
+    let image_data = match BASE64.decode(base64_clean) {
+        Ok(data) => {
+            data
+        },
+        Err(e) => {
+            return Err(format!("Base64解码失败: {}", e));
+        }
+    };
+
+    // 保存文件
+    match fs::write(&file_path, image_data) {
+        Ok(_) => {
+            Ok(serde_json::json!({
+                "success": true,
+                "message": "图片保存成功",
+                "path": file_path.to_string_lossy().to_string()
+            }))
+        },
+        Err(e) => {
+            let error_msg = format!("文件保存失败: {}", e);
+            Ok(serde_json::json!({
+                "success": false,
+                "message": error_msg,
+                "path": ""
+            }))
+        }
+    }
+}
+
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
 pub fn run() {
     tauri::Builder::default()
+        .plugin(tauri_plugin_fs::init())
         .plugin(tauri_plugin_shell::init())
         .plugin(tauri_plugin_opener::init())
         .invoke_handler(tauri::generate_handler![
             execute_command,
-            get_command_path
+            get_command_path,
+            save_base64_image
         ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");

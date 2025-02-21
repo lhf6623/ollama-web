@@ -5,9 +5,9 @@ import UnoCSS from "unocss/vite";
 import { nodePolyfills } from "vite-plugin-node-polyfills";
 import nodeStdlibBrowser from "vite-plugin-node-stdlib-browser";
 
-// @ts-expect-error process is a nodejs global
+// @ ts-expect-error process is a nodejs global
 const host = process.env.TAURI_DEV_HOST;
-// @ts-expect-error process is a nodejs global
+// @ ts-expect-error process is a nodejs global
 const isDev = process.env.NODE_ENV === "development";
 
 // https://vitejs.dev/config/
@@ -31,7 +31,7 @@ export default defineConfig(async () => ({
           "highlight.js": ["highlight.js"],
           ollama: ["ollama"],
           vue: ["vue", "pinia", "pinia-plugin-persistedstate"],
-          marked: ["marked", "marked-highlight", "dompurify"],
+          marked: ["marked", "marked-highlight"],
           util: ["dayjs", "lodash-es"],
           tauri: ["@tauri-apps/plugin-shell", "@tauri-apps/api"],
         },

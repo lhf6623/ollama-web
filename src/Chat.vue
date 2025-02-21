@@ -2,30 +2,30 @@
   <div
     v-if="show"
     ref="chatRef"
+    class="flex gap-2"
     :class="isUser ? 'mt16px first-of-type:mt0' : ''"
   >
+    <div>
+      <NCheckbox
+        :checked="select"
+        v-if="index !== undefined && store.isSelect"
+        @update:checked="handleUpdateChecked"
+      ></NCheckbox>
+    </div>
     <NSpin v-if="!hasValue"></NSpin>
-    <div v-if="hasValue" class="group">
-      <div v-if="!isUser" class="flex items-center justify-start">
+    <div v-if="hasValue" :id="`img_chat_${index ?? ''}`" class="group flex-1">
+      <div v-if="!isUser" class="flex items-center justify-start mb-5px">
         <span class="text-sm text-gray-500">{{ chat.model }}</span>
       </div>
       <div
         :class="`${
-          chat.role == 'user' ? 'flex items-center justify-end' : ''
+          chat.role == 'user' ? 'flex items-center justify-center' : ''
         } `"
       >
-        <div
-          :class="`${
-            chat.role == 'user'
-              ? 'bg-#e7e8e7 px-20px rounded-full py-6px w-fit'
-              : ''
-          }`"
-        >
-          <div v-if="isUser" v-html="htmlStr"></div>
-          <div v-else class="markdown-body mt12px" v-html="htmlStr"></div>
-        </div>
+        <div v-if="isUser" class="rounded-full" v-html="htmlStr"></div>
+        <div v-else class="markdown-body" v-html="htmlStr"></div>
       </div>
-      <div class="text-right" v-if="isUser && !store.loading">
+      <div class="text-center" v-if="isUser && !store.loading">
         <p
           class="h20px *:hidden group-hover:*:inline-block *:text-12px *:mr-8px"
         >
@@ -87,7 +87,7 @@
         const _code = encodeURI(code);
         const codeBox = `<div class="code-title">
           <span>${lang || "&nbsp;"}</span>
-          <button data-code="${_code}" class="__copy-code"><i data-code="${_code}" class="i-mdi:content-copy __copy-code"></i></button>
+          <button data-code="${_code}" class="__copy-code">复制</button>
         </div>${value}`;
         return codeBox;
       },
@@ -99,15 +99,39 @@
     const value = [...new Set(Object.values(chat.value))];
     return value.length !== 1;
   });
+  const select = computed(() => {
+    return store.selectChat.includes(props.index!);
+  });
 
+  function handleUpdateChecked(val: boolean) {
+    if (!val) {
+      store.selectChat = store.selectChat.filter(
+        (item) => item !== props.index
+      );
+      return;
+    }
+    store.selectChat.push(props.index!);
+  }
   const htmlStr = computed(() => {
     const result = chat.value.content
       .replace(/\<think\>/g, "<div class='think'>")
       .replace(/\<\/think\>/g, "</div>");
 
+    const renderer = new marked.Renderer();
+
+    // 覆盖 link 渲染方法
+    renderer.link = function ({ href, title, text }) {
+      // 添加 target="_blank" 和 rel="noopener noreferrer"（推荐安全做法）
+      return `<a href="${href}" title="${title}" target="_blank" rel="noopener noreferrer">${text}</a>`;
+    };
+    marked.setOptions({
+      renderer: renderer,
+    });
     const md = marked.parse(result) as string;
 
-    return `${DOMPurify.sanitize(md)}`;
+    return DOMPurify.sanitize(md, {
+      ADD_ATTR: ["target"],
+    });
   });
 
   const isUser = computed(() => {
@@ -148,35 +172,25 @@
 
   let timCode: number | null = null;
   async function copyChatCode(e: MouseEvent) {
-    const copyIcon = "i-mdi:content-copy";
-    const successIcon = "i-mdi:success";
-    const errorIcon = "i-mdi:error-outline";
-
     const { target } = e;
+
     if (
       target instanceof HTMLElement &&
       target.classList.contains("__copy-code")
     ) {
-      const { classList } =
-        target.tagName === "I" ? target : target.children[0];
-
       const { code } = target.dataset;
       try {
         await navigator.clipboard.writeText(decodeURI(code!));
-        classList.remove(copyIcon);
-        classList.add(successIcon);
+        target.innerHTML = "已复制";
       } catch (error) {
-        classList.remove(copyIcon);
-        classList.add(errorIcon);
+        target.innerHTML = "复制失败";
       }
       if (timCode) {
         clearTimeout(timCode);
         timCode = null;
       }
       timCode = setTimeout(() => {
-        classList.remove(successIcon);
-        classList.remove(errorIcon);
-        classList.add(copyIcon);
+        target.innerHTML = "复制";
       }, 4000);
     }
   }

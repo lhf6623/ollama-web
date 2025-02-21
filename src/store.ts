@@ -15,6 +15,8 @@ type Store = {
   showMenu: boolean;
   menu: Menu[];
   currentId: number;
+  isSelect: boolean;
+  selectChat: number[];
 };
 
 export const useStore = defineStore("store", {
@@ -39,6 +41,9 @@ export const useStore = defineStore("store", {
     menu: [],
     /** 当前的菜单 ID */
     currentId: Date.now(),
+    /** 选择聊天记录生成图片 */
+    isSelect: false,
+    selectChat: [],
   }),
   getters: {
     chatList: (state): ChatMessage[] => {

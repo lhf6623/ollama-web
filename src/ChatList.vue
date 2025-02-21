@@ -55,6 +55,9 @@
     deep: true,
   });
 
+  watch(() => store.loading, toScrollBottom);
+  watch(() => store.chatList, toScrollBottom, { deep: true });
+
   watch(
     () => store.currentId,
     () => {

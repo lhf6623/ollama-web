@@ -8,13 +8,17 @@
 
 <template>
   <NDialogProvider>
-    <div class="hfull wfull flex">
-      <Menus></Menus>
-      <main class="overflow-hidden relative hfull flex flex-1 flex-col pt34px">
-        <Title :title="pck.name"></Title>
-        <ChatList></ChatList>
-        <InpuProblem></InpuProblem>
-      </main>
-    </div>
+    <NMessageProvider>
+      <div class="hfull wfull flex">
+        <Menus></Menus>
+        <main
+          class="overflow-hidden relative hfull flex flex-1 flex-col pt34px"
+        >
+          <Title :title="pck.name"></Title>
+          <ChatList></ChatList>
+          <InpuProblem></InpuProblem>
+        </main>
+      </div>
+    </NMessageProvider>
   </NDialogProvider>
 </template>
